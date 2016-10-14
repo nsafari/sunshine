@@ -21,6 +21,7 @@ import com.example.yad.sunshine.app.activity.Detail;
 import com.example.yad.sunshine.app.FetchForecastTask;
 import com.example.yad.sunshine.app.R;
 import com.example.yad.sunshine.app.Weather;
+import com.example.yad.sunshine.app.activity.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,12 @@ public class ForecastFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     @Override
@@ -69,7 +76,7 @@ public class ForecastFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecast = stringArrayAdapter.getItem(position);
                 Intent intent = new Intent(getContext(), Detail.class)
-                                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
                 startActivity(intent);
             }
         });
@@ -128,21 +135,30 @@ public class ForecastFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            Log.d(TAG, "onOptionsItemSelected: refresh selected");
-            weather.fetchForecast(new FetchForecastTask.AsyncResponse() {
-                @Override
-                public void processFinished(String[] result) {
-                    if (result == null) {
-                        return;
-                    }
-                    stringArrayAdapter.clear();
-                    stringArrayAdapter.addAll(result);
-                }
-            });
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                Log.d(TAG, "onOptionsItemSelected: refresh selected");
+                updateWeather();
+                return true;
+            case R.id.action_settings:
+                Intent settingIntent = new Intent(this.getContext(), SettingsActivity.class);
+                startActivity(settingIntent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateWeather() {
+        weather.fetchForecast(this, new FetchForecastTask.AsyncResponse() {
+            @Override
+            public void processFinished(String[] result) {
+                if (result == null) {
+                    return;
+                }
+                stringArrayAdapter.clear();
+                stringArrayAdapter.addAll(result);
+            }
+        });
     }
 
     public void onButtonClick(View view) {
