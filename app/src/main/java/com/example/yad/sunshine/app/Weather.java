@@ -16,12 +16,11 @@ public class Weather {
     }
 
     public void fetchForecast(ForecastFragment fragment, FetchForecastTask.AsyncResponse asyncResponse){
-        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(fragment.getContext());
-        String location = defaultSharedPreferences.getString(fragment.getString(R.string.pref_location_key),
-                                fragment.getString(R.string.prf_location_default));
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(fragment.getContext());
+        String location = preferences.getString(fragment.getString(R.string.pref_location_key), fragment.getString(R.string.prf_location_default));
 
         //AsyncTask can be executed only once, so create a new one on each call
-        fetchForecastTask = new FetchForecastTask(asyncResponse);
+        fetchForecastTask = new FetchForecastTask(fragment.getActivity(), asyncResponse);
         fetchForecastTask.execute(location);
     }
 }

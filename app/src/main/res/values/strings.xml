@@ -112,6 +112,7 @@
         <item>سانتی گراد</item>
         <item>فارنهایت</item>
     </string-array>
+    <string name="pref_temperature_units_imperial">Imperial</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
@@ -171,4 +172,6 @@
     <string name="pref_location_label">موقعیت</string>
     <string name="pref_location_key" translatable="false">location</string>
     <string name="prf_location_default" translatable="false">112931</string>
+    <string name="action_share">اشتراک گذاری</string>
+    <string name="action_map">نقشه</string>
 </resources>

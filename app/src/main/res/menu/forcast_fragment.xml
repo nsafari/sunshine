@@ -1,7 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.yad.sunshine.app.ScrollingActivity">
+    xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/action_refresh"
         android:orderInCategory="1"
@@ -12,4 +11,13 @@
         android:orderInCategory="1"
         android:title="@string/settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_share"
+        android:title="@string/action_share"
+        android:showAsAction="ifRoom|collapseActionView"
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
+    <item
+        android:id="@+id/action_map"
+        android:title="@string/action_map"
+        android:showAsAction="ifRoom|collapseActionView"/>
 </menu>

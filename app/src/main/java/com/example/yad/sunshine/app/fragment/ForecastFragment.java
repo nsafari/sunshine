@@ -2,10 +2,14 @@ package com.example.yad.sunshine.app.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -144,8 +148,28 @@ public class ForecastFragment extends Fragment {
                 Intent settingIntent = new Intent(this.getContext(), SettingsActivity.class);
                 startActivity(settingIntent);
                 return true;
+            case R.id.action_map:
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+                String location = preferences.getString(getString(R.string.pref_location_key), getString(R.string.prf_location_default));
+                opnLocationOnMap(location);
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void opnLocationOnMap(String location) {
+        Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
+                .appendQueryParameter("q", location)
+                .build();
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocation);
+
+        if(intent.resolveActivity(this.getContext().getPackageManager()) != null){
+            startActivity(intent);
+        }
+        else{
+            Log.d(TAG, "Could not show map");
+        }
     }
 
     private void updateWeather() {
