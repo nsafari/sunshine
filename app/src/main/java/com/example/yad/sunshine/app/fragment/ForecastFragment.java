@@ -3,13 +3,11 @@ package com.example.yad.sunshine.app.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.yad.sunshine.app.activity.Detail;
+import com.example.yad.sunshine.app.activity.DetailActivity;
 import com.example.yad.sunshine.app.FetchForecastTask;
 import com.example.yad.sunshine.app.R;
 import com.example.yad.sunshine.app.Weather;
@@ -79,7 +77,7 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecast = stringArrayAdapter.getItem(position);
-                Intent intent = new Intent(getContext(), Detail.class)
+                Intent intent = new Intent(getContext(), DetailActivity.class)
                         .putExtra(Intent.EXTRA_TEXT, forecast);
                 startActivity(intent);
             }

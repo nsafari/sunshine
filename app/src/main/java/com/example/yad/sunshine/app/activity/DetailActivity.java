@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.example.yad.sunshine.app.R;
 
-public class Detail extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
