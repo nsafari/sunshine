@@ -24,6 +24,12 @@
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity" />
+
+        <provider
+            android:authorities="com.example.yad.sunshine.app"
+            android:name=".data.WeatherProvider">
+
+        </provider>
     </application>
 
 

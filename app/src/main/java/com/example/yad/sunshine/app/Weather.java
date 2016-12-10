@@ -1,8 +1,13 @@
 package com.example.yad.sunshine.app;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.CursorAdapter;
 
+import com.example.yad.sunshine.app.data.WeatherProvider;
 import com.example.yad.sunshine.app.fragment.ForecastFragment;
 
 /**
@@ -22,5 +27,15 @@ public class Weather {
         //AsyncTask can be executed only once, so create a new one on each call
         fetchForecastTask = new FetchForecastTask(fragment.getActivity(), asyncResponse);
         fetchForecastTask.execute(location);
+    }
+
+    public void registFetchForecastLoader(ForecastFragment fragment, CursorAdapter weatherCursorAdapter){
+        fragment.getLoaderManager().restartLoader(
+                WeatherCursorLoader.WEATHER_CURSOR_LOADER_ID,
+                null,
+                new WeatherCursorLoader(fragment.getContext(), weatherCursorAdapter)
+                );
+
+
     }
 }

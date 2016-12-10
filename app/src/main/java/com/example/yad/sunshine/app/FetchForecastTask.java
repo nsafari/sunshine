@@ -41,6 +41,7 @@ public class FetchForecastTask extends AsyncTask<String, Void, String[]>{
         activity = context;
     }
 
+
     @Override
     protected String[] doInBackground(String... params) {
         if(params.length == 0){

@@ -1,13 +1,18 @@
 package com.example.yad.sunshine.app.fragment;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,14 +29,19 @@ import com.example.yad.sunshine.app.FetchForecastTask;
 import com.example.yad.sunshine.app.R;
 import com.example.yad.sunshine.app.Weather;
 import com.example.yad.sunshine.app.activity.SettingsActivity;
+import com.example.yad.sunshine.app.data.WeatherContract;
+import com.example.yad.sunshine.app.data.WeatherProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ForecastFragment extends Fragment {
+    private WeatherProvider weatherProvider = new WeatherProvider();
+
     private final String TAG = ForecastFragment.class.getSimpleName();
 
     private ArrayAdapter<String> stringArrayAdapter;
+    private CursorAdapter cursorAdapter;
 
     private OnFragmentInteractionListener mListener;
     private Weather weather;
@@ -40,6 +50,9 @@ public class ForecastFragment extends Fragment {
         // Required empty public constructor
         weather = new Weather();
         stringArrayAdapter = null;
+        cursorAdapter = new SimpleCursorAdapter(
+                this.getContext(),
+                0, null, null, null, 0);
     }
 
     @Override
@@ -89,6 +102,13 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_forecast_list, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        weather.registFetchForecastLoader(this, cursorAdapter);
+
+        super.onActivityCreated(savedInstanceState);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -155,6 +175,34 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private long addLocation(String locationSetting, String cityName, double lat, double lon){
+        long locationId;
+
+        Cursor locationCursor = weatherProvider.query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                new String[]{WeatherContract.LocationEntry._ID},
+                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
+                new String[]{locationSetting},
+                null);
+        if(locationCursor.moveToNext()){
+            int locationIdIndex = locationCursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            locationId = locationCursor.getLong(locationIdIndex);
+        }
+        else {
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
+            contentValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
+            contentValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
+            contentValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
+            Uri uri = weatherProvider.insert(
+                    WeatherContract.LocationEntry.CONTENT_URI,
+                    contentValues);
+            locationId = ContentUris.parseId(uri);
+        }
+        return locationId;
+    }
+
     private void opnLocationOnMap(String location) {
         Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
                 .appendQueryParameter("q", location)
@@ -182,6 +230,7 @@ public class ForecastFragment extends Fragment {
             }
         });
     }
+
 
     public void onButtonClick(View view) {
         Log.i("", "This is a test");
