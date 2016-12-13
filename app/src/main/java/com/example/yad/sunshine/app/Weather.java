@@ -29,7 +29,7 @@ public class Weather {
         fetchForecastTask.execute(location);
     }
 
-    public void registFetchForecastLoader(ForecastFragment fragment, CursorAdapter weatherCursorAdapter){
+    public void registerFetchForecastLoader(ForecastFragment fragment, CursorAdapter weatherCursorAdapter){
         fragment.getLoaderManager().restartLoader(
                 WeatherCursorLoader.WEATHER_CURSOR_LOADER_ID,
                 null,

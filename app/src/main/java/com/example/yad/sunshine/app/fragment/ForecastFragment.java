@@ -119,7 +119,7 @@ public class ForecastFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        weather.registFetchForecastLoader(this, weatherAdapter);
+        weather.registerFetchForecastLoader(this, weatherAdapter);
 
         super.onActivityCreated(savedInstanceState);
     }

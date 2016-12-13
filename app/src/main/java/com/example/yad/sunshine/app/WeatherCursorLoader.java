@@ -15,22 +15,29 @@ import com.example.yad.sunshine.app.data.WeatherContract;
  * Created by Emertat on 11/30/2016.
  */
 public class WeatherCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
-    private final Context cursorContext;
+    private final Context mContext;
     private final CursorAdapter weatherCursorAdapter;
 
     public static final int WEATHER_CURSOR_LOADER_ID = 1001;
 
     public WeatherCursorLoader(Context context, CursorAdapter cursorAdapter) {
-        cursorContext = context;
+        mContext = context;
         weatherCursorAdapter = cursorAdapter;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+
+        String locationSetting = Utility.getPreferredLocation(mContext);
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                locationSetting, System.currentTimeMillis());
+
         return new CursorLoader(
-                cursorContext,
-                WeatherContract.WeatherEntry.CONTENT_URI,
-                null, null, null, null);
+                mContext,
+                weatherForLocationUri,
+                null, null, null,
+                sortOrder);
     }
 
     @Override
