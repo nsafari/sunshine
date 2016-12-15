@@ -23,6 +23,7 @@ import android.widget.ListView;
 
 import com.example.yad.sunshine.app.ForecastAdapter;
 import com.example.yad.sunshine.app.Utility;
+import com.example.yad.sunshine.app.WeatherCursorLoader;
 import com.example.yad.sunshine.app.activity.DetailActivity;
 import com.example.yad.sunshine.app.FetchForecastTask;
 import com.example.yad.sunshine.app.R;
@@ -36,7 +37,6 @@ import java.util.Arrays;
 public class ForecastFragment extends Fragment {
     private final String TAG = ForecastFragment.class.getSimpleName();
 
-    private ArrayAdapter<String> stringArrayAdapter;
     private CursorAdapter weatherAdapter;
 
     private OnFragmentInteractionListener mListener;
@@ -45,7 +45,6 @@ public class ForecastFragment extends Fragment {
     public ForecastFragment() {
         // Required empty public constructor
         weather = new Weather();
-        stringArrayAdapter = null;
     }
 
     @Override
@@ -57,42 +56,14 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        updateWeather();
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        String[] data = {
-                "Mon 6/23 - Sunny - 31/17",
-                "Tue 6/24 - Foggy - 21/8",
-                "Wed 6/25 - Cloudy - 22/17",
-                "Thurs 6/26 - Rainy - 18/11",
-                "Fri 6/27 - Foggy - 21/10",
-                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-                "Sun 6/29 - Sunny - 20/7"
-        };
-        stringArrayAdapter = new ArrayAdapter<String>(
-                getActivity(),
-                R.layout.item_forecast,
-                R.id.list_item_forecast_textview,
-                new ArrayList(Arrays.asList(data)));
-        ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
-        listView.setAdapter(stringArrayAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = stringArrayAdapter.getItem(position);
-                Intent intent = new Intent(getContext(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, forecast);
-                startActivity(intent);
-            }
-        });
+//        updateWeather();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_forecast_list, container, false);
+
         String locationSetting = Utility.getPreferredLocation(getActivity());
 
         // Sort order:  Ascending, by date.
@@ -100,28 +71,38 @@ public class ForecastFragment extends Fragment {
         Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
                 locationSetting, System.currentTimeMillis());
 
-        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
-                null, null, null, sortOrder);
+        Cursor cur = getActivity().getContentResolver().query(
+                weatherForLocationUri,
+                WeatherCursorLoader.FORECAST_COLUMNS,
+                null, null,
+                sortOrder);
 
         // The CursorAdapter will take data from our cursor and populate the ListView
         // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
         // up with an empty list the first time we run.
         weatherAdapter = new ForecastAdapter(getActivity(), cur, 0);
 
-        View rootView = inflater.inflate(R.layout.fragment_forecast_list, container, false);
-
         // Get a reference to the ListView, and attach this adapter to it.
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                weatherAdapter.getCursor().moveToPosition(position);
+                Intent intent = new Intent(getContext(), DetailActivity.class)
+                        .putExtra(
+                                Intent.EXTRA_TEXT,
+                                ForecastAdapter.ConvertCursorRowToUXFormat(
+                                        weatherAdapter.getCursor(),
+                                        Utility.isMetric(getContext()))
+                        );
+                startActivity(intent);
+            }
+        });
         listView.setAdapter(weatherAdapter);
 
-        return rootView;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         weather.registerFetchForecastLoader(this, weatherAdapter);
 
-        super.onActivityCreated(savedInstanceState);
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -203,6 +184,7 @@ public class ForecastFragment extends Fragment {
         }
     }
 
+    //Deprecated cursorAdapter notified when cursorLoader changed
     private void updateWeather() {
         weather.fetchForecast(this, new FetchForecastTask.AsyncResponse() {
             @Override
@@ -210,8 +192,8 @@ public class ForecastFragment extends Fragment {
                 if (result == null) {
                     return;
                 }
-                stringArrayAdapter.clear();
-                stringArrayAdapter.addAll(result);
+//                stringArrayAdapter.clear();
+//                stringArrayAdapter.addAll(result);
             }
         });
     }
