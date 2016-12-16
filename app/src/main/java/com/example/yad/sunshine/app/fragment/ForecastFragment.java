@@ -18,21 +18,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.yad.sunshine.app.ForecastAdapter;
+import com.example.yad.sunshine.app.model.loader.ForecastAdapter;
 import com.example.yad.sunshine.app.Utility;
-import com.example.yad.sunshine.app.WeatherCursorLoader;
+import com.example.yad.sunshine.app.model.loader.WeatherCursorLoader;
 import com.example.yad.sunshine.app.activity.DetailActivity;
-import com.example.yad.sunshine.app.FetchForecastTask;
+import com.example.yad.sunshine.app.model.loader.FetchForecastTask;
 import com.example.yad.sunshine.app.R;
-import com.example.yad.sunshine.app.Weather;
+import com.example.yad.sunshine.app.model.Weather;
 import com.example.yad.sunshine.app.activity.SettingsActivity;
 import com.example.yad.sunshine.app.data.WeatherContract;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ForecastFragment extends Fragment {
     private final String TAG = ForecastFragment.class.getSimpleName();
@@ -56,7 +52,13 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-//        updateWeather();
+        updateWeather();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        weather.registerFetchForecastLoader(this, weatherAdapter);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -87,21 +89,18 @@ public class ForecastFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                weatherAdapter.getCursor().moveToPosition(position);
-                Intent intent = new Intent(getContext(), DetailActivity.class)
-                        .putExtra(
-                                Intent.EXTRA_TEXT,
-                                ForecastAdapter.ConvertCursorRowToUXFormat(
-                                        weatherAdapter.getCursor(),
-                                        Utility.isMetric(getContext()))
-                        );
-                startActivity(intent);
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
+                    String locationSetting = Utility.getPreferredLocation(getActivity());
+                    Intent intent = new Intent(getActivity(), DetailActivity.class)
+                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                                    locationSetting, cursor.getLong(WeatherCursorLoader.COL_WEATHER_DATE)
+                            ));
+                    startActivity(intent);
+                }
             }
         });
         listView.setAdapter(weatherAdapter);
-
-        weather.registerFetchForecastLoader(this, weatherAdapter);
-
         return rootView;
     }
 
@@ -176,10 +175,9 @@ public class ForecastFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geoLocation);
 
-        if(intent.resolveActivity(this.getContext().getPackageManager()) != null){
+        if (intent.resolveActivity(this.getContext().getPackageManager()) != null) {
             startActivity(intent);
-        }
-        else{
+        } else {
             Log.d(TAG, "Could not show map");
         }
     }

@@ -1,12 +1,9 @@
 package com.example.yad.sunshine.app.fragment;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,39 +12,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.yad.sunshine.app.FetchForecastTask;
 import com.example.yad.sunshine.app.R;
 import com.example.yad.sunshine.app.activity.SettingsActivity;
+import com.example.yad.sunshine.app.model.Weather;
+import com.example.yad.sunshine.app.model.loader.DetailForecastViewHolder;
 
 public class DetailFragment extends Fragment {
+    private DetailForecastViewHolder viewHolder;
     public DetailFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Bundle extras = getActivity().getIntent().getExtras();
-        if(extras == null && extras.getString(Intent.EXTRA_TEXT).isEmpty()){
-            return;
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Intent intent = getActivity().getIntent();
+        if (intent != null) {
+            new Weather().registerDetailFetchForecastLoader(this, intent.getData(), viewHolder);
         }
-
-        String forecast = extras.getString(Intent.EXTRA_TEXT);
-        TextView viewById = (TextView)view.findViewById(R.id.textDetail);
-        viewById.setText(forecast);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        View view = inflater.inflate(R.layout.fragment_detail, container, false);
+        viewHolder = new DetailForecastViewHolder(view);
+        return view;
     }
 
     @Override

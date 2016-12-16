@@ -1,4 +1,4 @@
-package com.example.yad.sunshine.app;
+package com.example.yad.sunshine.app.model.loader;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +9,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 
+import com.example.yad.sunshine.app.Utility;
 import com.example.yad.sunshine.app.data.WeatherContract;
 
 /**

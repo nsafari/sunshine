@@ -1,4 +1,4 @@
-package com.example.yad.sunshine.app;
+package com.example.yad.sunshine.app.model.loader;
 
 import android.app.Activity;
 import android.content.ContentUris;
@@ -13,8 +13,8 @@ import android.support.v4.app.FragmentActivity;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.example.yad.sunshine.app.R;
 import com.example.yad.sunshine.app.data.WeatherContract;
-import com.example.yad.sunshine.app.data.WeatherProvider;
 import com.example.yad.sunshine.app.data.WeatherContract.*;
 
 import org.json.JSONArray;
@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Vector;
 
 /**
